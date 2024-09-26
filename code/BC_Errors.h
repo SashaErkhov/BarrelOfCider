@@ -48,6 +48,11 @@ public:
     }
 };
 
-
+class BC_shortUP: public BC_Error{
+public:
+    std::string what() const override {
+        return "Usenrame or password is too short";
+    }
+};
 
 #endif

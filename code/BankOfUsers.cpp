@@ -35,6 +35,7 @@ std::string createMessage(const std::string& username, const std::string& passwo
     checkUsername(username);
     checkPassword(password);
     if(username.size() > 50 or password.size() > 50) throw BC_longUP();
+    if(username.size() == 0 or username.size() < 4) throw BC_shortUP();
     std::string message;
     message.reserve(100);
     for(auto p: username) {message.push_back(p);}
@@ -65,7 +66,7 @@ namespace BankOfUsers {
         }
         users.seekp(0,std::ios_base::end);
         users_hash.seekp(0,std::ios_base::end);
-        users << username << std::endl;
+        users << ' ' << username;
         users.close();
         users_hash.write(message.c_str(), message.size());
         users_hash.close();
@@ -95,7 +96,6 @@ namespace BankOfUsers {
             throw BC_CanNotOpenFile("users_hash");
         }
 
-        //проверяю в файле со всеми хэшами
         bool ok=false;
         std::string user;
         char ch;
@@ -110,6 +110,29 @@ namespace BankOfUsers {
             }
         }
         users_hash.close();
+        return ok;
+    }
+
+    bool checkName(const std::string& username){
+        checkUsername(username);
+        if(username.size() > 50) throw BC_longUP();
+        if(username.size() == 0) throw BC_shortUP();
+        std::fstream users;
+        users.open("resources/users.txt", std::ios_base::in);
+        if(!users.is_open()){
+            throw BC_CanNotOpenFile("users.txt");
+        }
+        char ch;
+        bool ok=false;
+        std::string user;
+        while((ch=users.peek())!=EOF and ch!='\n' and ch!='\r') {
+            users >> user;
+            if(user==username) {
+                ok=true;
+                break;
+            }
+        }
+        users.close();
         return ok;
     }
 }
