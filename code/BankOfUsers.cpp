@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 
-void checkUsername(const std::string& username){
+inline void checkUsername(const std::string& username){
     for(auto p: username){
         if( !(
                 (p >= 'a' and p <= 'z') or
@@ -18,7 +18,7 @@ void checkUsername(const std::string& username){
     }
 }
 
-void checkPassword(const std::string& password){
+inline void checkPassword(const std::string& password){
     for(auto p: password) {
         if (!(
                 (p >= 'a' and p <= 'z') or
@@ -32,46 +32,84 @@ void checkPassword(const std::string& password){
 }
 
 std::string createMessage(const std::string& username, const std::string& password) {
+    checkUsername(username);
+    checkPassword(password);
+    if(username.size() > 50 or password.size() > 50) throw BC_longUP();
+    std::string message;
     message.reserve(100);
-    for(auto p: username) {
-        message.push_back(p);
-    }
-    for(size_t i=username.size();i<50;++i){
-        message.push_back(' ');
-    }
-    for(auto p: password) {
-        message.push_back(p);
-    }
-    for(size_t i=password.size();i<50;++i){
-        message.push_back(' ');
-    }
+    for(auto p: username) {message.push_back(p);}
+    for(size_t i=username.size();i<50;++i){message.push_back(' ');}
+    for(auto p: password) {message.push_back(p);}
+    for(size_t i=password.size();i<50;++i){message.push_back(' ');}
+    SHA256 hash;
+    hash.update(message.c_str(), message.size());
+    message = std::move(hash.hash());
     return message;
 }
 
 namespace BankOfUsers {
     void addUser(const std::string& username, const std::string& password) {
-        checkUsername(username);
-        checkPassword(password);
-        if(username.size() > 50 or password.size() > 50) throw BC_longUP();
         std::string message = createMessage(username, password);
-        SHA256 hash;
-        hash.update(message.c_str(), message.size());
-        message = std::move(hash.hash());
         std::fstream users;
-        users.open("users.txt", std::ios_base::out);
+        users.open("resources/users.txt", std::ios_base::out | std::ios_base::app);
         if(!users.is_open()){
             throw BC_CanNotOpenFile("users.txt");
         }
         std::fstream users_hash;
-        users_hash.open("users_hash.txt", std::ios_base::out | std::ios_base::binary);
+        users_hash.open("resources/users_hash",
+                        std::ios_base::out |
+                        std::ios_base::binary | std::ios_base::app);
         if(!users_hash.is_open()){
             users.close();
-            throw BC_CanNotOpenFile("users_hash.txt");
+            throw BC_CanNotOpenFile("users_hash");
         }
+        users.seekp(0,std::ios_base::end);
+        users_hash.seekp(0,std::ios_base::end);
         users << username << std::endl;
         users.close();
         users_hash.write(message.c_str(), message.size());
+        users_hash.close();
     }
 
+    void deleteAllUsers(){
+        std::fstream users;
+        users.open("resources/users.txt", std::ios_base::out);
+        if(!users.is_open()){
+            throw BC_CanNotOpenFile("users.txt");
+        }
+        users.close();
+        std::fstream users_hash;
+        users_hash.open("resources/users_hash",std::ios_base::out);
+        if(!users_hash.is_open()){
+            throw BC_CanNotOpenFile("users_hash");
+        }
+        users_hash.close();
+        addUser("admin", "admin");
+    }
 
+    bool checkUser(const std::string& username, const std::string& password){
+        std::string message = createMessage(username, password);
+        std::fstream users_hash;
+        users_hash.open("resources/users_hash",std::ios_base::in | std::ios_base::binary);
+        if(!users_hash.is_open()){
+            throw BC_CanNotOpenFile("users_hash");
+        }
+
+        //проверяю в файле со всеми хэшами
+        bool ok=false;
+        std::string user;
+        char ch;
+        char tmp[65];
+        tmp[64]='\0';
+        while((ch=users_hash.peek())!=EOF and ch!='\n' and ch!='\r') {
+            users_hash.read(tmp,64);
+            user=std::move(tmp);
+            if(user==message) {
+                ok=true;
+                break;
+            }
+        }
+        users_hash.close();
+        return ok;
+    }
 }
