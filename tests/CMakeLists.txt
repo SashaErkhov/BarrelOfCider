@@ -21,6 +21,10 @@ add_executable(tests
         ../code/BankOfUsers.cpp
         ../code/sha256.cpp
         BUtests.cpp
+        ../code/BC_types.h
+        ../code/DB.cpp
+        ../code/DB.h
+        ../code/ID.h
 )
 target_link_libraries(tests GTest::gtest_main)
 
@@ -31,5 +35,9 @@ add_executable(GlobalTest
         GT.cpp
         ../code/BankOfUsers.cpp
         ../code/sha256.cpp
+        ../code/BC_types.h
+        ../code/DB.cpp
+        ../code/DB.h
+        ../code/ID.h
 )
 include_directories(../code)

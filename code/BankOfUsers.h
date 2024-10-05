@@ -10,4 +10,4 @@ namespace BankOfUsers {
     bool checkName(const std::string& username);
 }
 
-#endif
+#endif // ! BC_BANKOFUSERS_2024

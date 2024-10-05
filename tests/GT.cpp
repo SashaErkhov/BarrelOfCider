@@ -5,7 +5,8 @@
 
 int main(){
     try {
-        BankOfUsers::deleteAllUsers();
+        std::cout << UINT_MAX << ' ' << std::endl;
+
     }catch(BC_Error& error){
         std::cout<< error.what()<<std::endl;
         return 1;
