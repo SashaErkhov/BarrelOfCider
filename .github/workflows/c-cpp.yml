@@ -26,5 +26,11 @@ jobs:
         run: make
       - name: test of BankOfUsers
         run: ./BUtests
+      - name: test of Logs
+        run: ./LogsTests
+      - name: test of memory of Log
+        run: valgrind --tool=memcheck --leak-check=full --undef-value-errors=no --error-exitcode=111 ./LogsTests
+      - name: test of memory of BankOfUsers
+        run: valgrind --tool=memcheck --leak-check=full --undef-value-errors=no --error-exitcode=111 ./BUtests
       - name: make clean
         run: make clean

@@ -6,6 +6,7 @@
 #define BC_ID_H
 
 #include <cstdint>
+#include <string>
 
 #define type_id std::uint32_t
 
@@ -32,8 +33,11 @@ public:
     bool operator>(const BC_ID& other) const{ return this->val_ > other.val_;}
     bool operator<=(const BC_ID& other) const{ return this->val_ <= other.val_;}
     bool operator>=(const BC_ID& other) const{ return this->val_ >= other.val_;}
+
+    friend std::string to_string(const BC_ID& val);
 };
 type_id BC_ID::next_id_ = 1;
 
+std::string to_string(const BC_ID& val) {return std::to_string(val.val_);}
 
 #endif //BC_ID_H

@@ -1,12 +1,9 @@
-#include <string>
-#include <iostream>
-#include "Logs.h"
+#include <gtest/gtest.h>
+#include "../code/Logs.h"
 
-int main()
-{
+TEST(LogsTests, Test) {
     Logs::debug("Hello");
     Logs::info("Hello");
     Logs::error("Hello");
     Logs::warning("Hello");
-    return 0;
 }

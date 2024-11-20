@@ -26,7 +26,6 @@ class DataBank {
 
     std::map<std::string, PartsOfTable_> tables_;
     std::unique_ptr<Table_> actualTable_;
-
 public:
     DataBank();
     void createTable(const std::string& nameTable, std::uint8_t cntCol,
@@ -35,7 +34,7 @@ public:
     void closeTable();
     void addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow);
     std::string getAllRows();
-    std::string getAllRowsOfTable();
+    std::string getAllRowsOfTable() const;
 };
 
 class DataBank::Table_ {
@@ -49,7 +48,10 @@ class DataBank::Table_ {
 public:
     Table_(const std::string& nameTable, BC_ID id, std::uint8_t cntCol, std::vector<std::uint8_t>& typesCol,
            std::vector<std::string>& namesCol, type_id firstRow);
-    void addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow);
+    BC_ID addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow);
+    std::size_t getCntRows() const {return rows_.size();}
+    std::string getName() const {return nameTable_;}
+    std::string getAllRows() const;
 };
 
 class DataBank::Papers_ {

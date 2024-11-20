@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(tests)
 
 # GoogleTest requires at least C++14
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
@@ -21,10 +21,8 @@ add_executable(tests
         ../code/BankOfUsers.cpp
         ../code/sha256.cpp
         BUtests.cpp
-        ../code/BC_types.h
-        ../code/DB.cpp
-        ../code/DB.h
-        ../code/ID.h
+        ../code/Logs.cpp
+        LogsTests.cpp
 )
 target_link_libraries(tests GTest::gtest_main)
 
@@ -33,11 +31,8 @@ gtest_discover_tests(tests)
 
 add_executable(GlobalTest
         GT.cpp
-        ../code/BankOfUsers.cpp
-        ../code/sha256.cpp
-        ../code/BC_types.h
-        ../code/DB.cpp
-        ../code/DB.h
-        ../code/ID.h
+        ../code/Logs.cpp
 )
+
 include_directories(../code)
+#include_directories(../..)

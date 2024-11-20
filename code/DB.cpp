@@ -4,6 +4,7 @@
 
 #include "DB.h"
 #include "BC_Errors.h"
+#include <iomanip>
 
 DataBank::DataBank() {
     actualTable_ = nullptr;
@@ -50,10 +51,33 @@ void DataBank::closeTable() {
 }
 
 void DataBank::addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow) {
+    type_id* firstRow=&tables_[actualTable_->getName()].firstRow;
     if(actualTable_.get()==nullptr){
         throw BC_TableNotOpen();
     }
-    actualTable_->addRow(val, lenRow);
+    BC_ID id = actualTable_->addRow(val, lenRow);
+    if(*firstRow == 0) *firstRow=id.get();
+}
+
+std::string DataBank::getAllRowsOfTable() const {
+    if(actualTable_.get()==nullptr){
+        throw BC_TableNotOpen();
+    }
+    return actualTable_->getAllRows();
+}
+
+std::string DataBank::getAllRows(){
+    std::unique_ptr<Table_> table = std::move(actualTable_);
+    closeTable();
+    if(actualTable_.get()==nullptr){
+        throw BC_TableNotOpen();
+    }
+    std::stringstream ss;
+    for(auto p: tables_) {
+        openTable(p.first);
+        ss<<actualTable_->getAllRows()<<std::endl;
+    }
+    actualTable_=std::move(table);
 }
 
 DataBank::Table_::Table_(const std::string& nameTable, BC_ID id, std::uint8_t cntCol, std::vector<std::uint8_t>& typesCol,
@@ -86,9 +110,18 @@ DataBank::Table_::Table_(const std::string& nameTable, BC_ID id, std::uint8_t cn
     }
 }
 
-void DataBank::Table_::addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow) {
+BC_ID DataBank::Table_::addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow) {
     if(lenRow!=lenRow_) { throw BC_InvalidLengthAddRow();}
     BC_ID id={};
     Papers_::upload(id, id_, val, lenRow);
     rows_[id]=val;
+    return id;
+}
+
+std::string DataBank::Table_::getAllRows() const {
+    //Длина таблицы = 120 символов
+    std::stringstream ss;
+    std::string intro=nameTable_+"(ID: "+to_string(id_)+")";
+    ss<<std::string(60-intro.size()/2,' ')<<intro<<std::endl;
+    ss<<std::string(120, '-')<<std::endl;
 }

@@ -131,7 +131,7 @@ class BC_IvalidTypeCreateTable: public BC_Error {
 public:
     BC_IvalidTypeCreateTable(BC_ID idTable, std::uint8_t type) : idTable(idTable), type(type) {}
     std::string what() const override {
-        return "Can not create table with id = " + std::to_string(idTable) +
+        return "Can not create table with id = " + to_string(idTable) +
                " and type = " + std::to_string(type);
     }
 };
