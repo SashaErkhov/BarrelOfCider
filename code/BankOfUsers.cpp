@@ -35,7 +35,7 @@ std::string createMessage(const std::string& username, const std::string& passwo
     checkUsername(username);
     checkPassword(password);
     if(username.size() > 50 or password.size() > 50) throw BC_longUP();
-    if(username.size() == 0 or username.size() < 4) throw BC_shortUP();
+    if(username.size() == 0 or password.size() < 4) throw BC_shortUP();
     std::string message;
     message.reserve(100);
     for(auto p: username) {message.push_back(p);}

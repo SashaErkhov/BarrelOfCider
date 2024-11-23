@@ -4,124 +4,79 @@
 
 #include "DB.h"
 #include "BC_Errors.h"
-#include <iomanip>
+#include "ID.h"
+#include <sstream>
+#include <memory>
+#include "Logs.h"
 
-DataBank::DataBank() {
-    actualTable_ = nullptr;
-}
-
-void DataBank::createTable(const std::string& nameTable, std::uint8_t cntCol,
-                 const std::vector<std::uint8_t>& typesCol,
-                 const std::vector<std::string>& namesCol) {
-    if(nameTable.size() > 50 or cntCol==0) throw BC_InvalidLength(nameTable);
-    for(auto p: namesCol){
-        if(p.size()>50) throw BC_InvalidLength(nameTable);
+std::string DataBank::createMessage_(type_id id, const std::string& name, const std::string& value) const{
+    Logs::debug(std::to_string(name.size()).c_str());
+    if(name.size() > 50 or value.size() > 1024){
+        throw BC_longNameOrValueDB();
     }
-    std::uint8_t cnt=cntCol;
-    std::size_t cntNames=namesCol.size();
-     for(auto p: typesCol){
-         if(p<=11){
-             --cnt;
-             --cntNames;
-             if(p==2) {++p;} // String
-         } else {
-             throw BC_InvalidCreateType(nameTable,typesCol);
-         }
-     }
-    if( cnt != 0 and cntNames!=0 ) throw BC_InvalidCreateCntCol(nameTable,cntCol, typesCol.size(), namesCol.size());
-
-    PartsOfTable_ now={{},cntCol, typesCol, namesCol,0};
-    tables_[nameTable]=now;
-    openTable(nameTable);
+    std::string message;
+    message.reserve(sizeMessage_);
+    for(auto p: std::to_string(id)) {message.push_back(p);}
+    Logs::debug(message.c_str());
+    for(size_t i=std::to_string(id).size(); i<50; ++i) {message.push_back(' ');}
+    Logs::debug(message.c_str());
+    for(auto p: name) {message.push_back(p);}
+    Logs::debug(message.c_str());
+    for(size_t i = name.size(); i<50; ++i) {message.push_back(' ');}
+    Logs::debug(message.c_str());
+    for(auto p: value) {message.push_back(p);}
+    Logs::debug(message.c_str());
+    for(size_t i = value.size(); i<1024; ++i) {message.push_back(' ');}
+    Logs::debug(message.c_str());
+    return message;
 }
 
-void DataBank::openTable(const std::string& nameTable) {
-    if(auto it=tables_.find(nameTable); it==tables_.end()){
-        throw BC_TableNotFound(nameTable);
-    } else {
-        closeTable();
-        PartsOfTable_ now = it->second;
-        actualTable_ = std::make_unique<Table_>(nameTable, now.idTable, now.cntCol, now.typesCol,
-                                                now.namesCol,now.firstRow);
+void DataBank::add(const std::string& name, const std::string& value){
+    file_.open(fileName_, std::ios_base::app |
+        std::ios_base::out | std::ios_base::binary);
+    if(!file_.is_open()){
+        throw BC_CanNotOpenFile(fileName_);
     }
+    type_id id = ider_.nextID();
+    std::string message = createMessage_(id, name, value);
+    file_.seekp(0, std::ios_base::end);
+    Logs::debug(std::to_string(message.size()).c_str());
+    file_.write(message.c_str(), message.size());
+    file_.close();
+    ids_.insert(id);
 }
 
-void DataBank::closeTable() {
-    actualTable_.reset(nullptr);
-}
-
-void DataBank::addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow) {
-    type_id* firstRow=&tables_[actualTable_->getName()].firstRow;
-    if(actualTable_.get()==nullptr){
-        throw BC_TableNotOpen();
+std::string DataBank::getAll(){
+    file_.open(fileName_, std::ios_base::in | std::ios_base::binary);
+    if(!file_.is_open()){
+        throw BC_CanNotOpenFile(fileName_);
     }
-    BC_ID id = actualTable_->addRow(val, lenRow);
-    if(*firstRow == 0) *firstRow=id.get();
-}
-
-std::string DataBank::getAllRowsOfTable() const {
-    if(actualTable_.get()==nullptr){
-        throw BC_TableNotOpen();
-    }
-    return actualTable_->getAllRows();
-}
-
-std::string DataBank::getAllRows(){
-    std::unique_ptr<Table_> table = std::move(actualTable_);
-    closeTable();
-    if(actualTable_.get()==nullptr){
-        throw BC_TableNotOpen();
-    }
+    file_.seekg(0, std::ios_base::beg);
     std::stringstream ss;
-    for(auto p: tables_) {
-        openTable(p.first);
-        ss<<actualTable_->getAllRows()<<std::endl;
+    std::unique_ptr<char[]> mes(new char[sizeMessage_+1]);
+    std::string message;
+    while(file_.peek() != EOF){
+        file_.read(mes.get(), sizeMessage_);
+        mes[sizeMessage_]='\0';
+        message=std::string(mes.get());
+        Logs::debug(message.c_str());
+        Logs::debug(std::to_string(message.size()).c_str());
+        size_t i;
+        for(i=0; message[i]!=' '; ++i);
+        ss << "ID: " << message.substr(0, i)
+            << ' ';
+        size_t len=0;
+        for(i=50; message[i]!=' ' and len!=50; ++i, ++len);
+        ss << "Name: " << message.substr(50, len)
+            << ' ';
+        for(i=100, len=0; message[i]!=' ' and len!=1024; ++i, ++len);
+        ss << "Value: " << message.substr(100, len)
+            << std::endl;
     }
-    actualTable_=std::move(table);
+    file_.close();
+    return ss.str();
 }
 
-DataBank::Table_::Table_(const std::string& nameTable, BC_ID id, std::uint8_t cntCol, std::vector<std::uint8_t>& typesCol,
-                         std::vector<std::string>& namesCol, type_id firstRow):
-    id_(id), cntCol_(cntCol), typesCol_(typesCol), namesCol_(namesCol), nameTable_(nameTable)
-{
-    lenRow_=0;
-    for(std::uint8_t i=0; i<cntCol_; ++i) {
-        switch(typesCol_[i]) {
-            case 0: {++lenRow_; break;} // Bool
-            case 1: {++lenRow_; break;} // Char
-            case 2: {
-                lenRow_+=typesCol_[++i]; // Длина строки
-                break;
-            }// String
-            case 3: {++lenRow_; break;} // Int8
-            case 4: {lenRow_+=2; break;} // Int16
-            case 5: {lenRow_+=4; break;} // Int32
-            case 6: {lenRow_+=8; break;} // Int64
-            case 7: {++lenRow_; break;} // Uint8
-            case 8: {lenRow_+=2; break;} // Uint16
-            case 9: {lenRow_+=4; break;} // Uint32
-            case 10:{lenRow_+=8; break;} // Uint64
-            case 11:{lenRow_+=6; break;} // DataTime
-            default: throw BC_IvalidTypeCreateTable(id, typesCol[i]);
-            }
-    }
-    if(firstRow != 0) {
-        rows_=Papers_::download(firstRow, id_, lenRow_);
-    }
-}
-
-BC_ID DataBank::Table_::addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow) {
-    if(lenRow!=lenRow_) { throw BC_InvalidLengthAddRow();}
-    BC_ID id={};
-    Papers_::upload(id, id_, val, lenRow);
-    rows_[id]=val;
-    return id;
-}
-
-std::string DataBank::Table_::getAllRows() const {
-    //Длина таблицы = 120 символов
-    std::stringstream ss;
-    std::string intro=nameTable_+"(ID: "+to_string(id_)+")";
-    ss<<std::string(60-intro.size()/2,' ')<<intro<<std::endl;
-    ss<<std::string(120, '-')<<std::endl;
+DataBank::DataBank(IDer ider): ider_(ider){
+    fileName_= "resources/data_" + std::to_string(ider_.nextID()) + ".txt";
 }

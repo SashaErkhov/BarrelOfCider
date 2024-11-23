@@ -2,63 +2,34 @@
 // Created by sasor on 29.09.2024.
 //
 
+#pragma once
 #ifndef BC_DB_H_2024
 #define BC_DB_H_2024
 
-#include <memory>
-#include "ID.h"
-#include <cstdint>
 #include <string>
-#include <map>
-#include <vector>
+#include "ID.h"
+#include <set>
+#include <fstream>
 
 class DataBank {
+    IDer ider_;
+    std::set<type_id> ids_;
+    std::fstream file_;
+    const std::size_t sizeMessage_=50+50+1024;
+    std::string fileName_;
 
-    class Table_;
-    class Papers_;
-    struct PartsOfTable_ {
-        BC_ID idTable;
-        std::uint8_t cntCol;
-        std::vector<std::uint8_t> typesCol;
-        std::vector<std::string> namesCol;
-        type_id firstRow;// type_id объявлен в ID.h
-    };
-
-    std::map<std::string, PartsOfTable_> tables_;
-    std::unique_ptr<Table_> actualTable_;
+    std::string createMessage_(type_id id, const std::string& name,
+                               const std::string& value) const;
 public:
-    DataBank();
-    void createTable(const std::string& nameTable, std::uint8_t cntCol,
-                     const std::vector<std::uint8_t>& typesCol, const std::vector<std::string>& namesCol);
-    void openTable(const std::string& nameTable);
-    void closeTable();
-    void addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow);
-    std::string getAllRows();
-    std::string getAllRowsOfTable() const;
-};
+    DataBank(IDer ider);
 
-class DataBank::Table_ {
-    std::string nameTable_;
-    BC_ID id_;
-    std::uint8_t cntCol_;
-    std::vector<std::uint8_t> typesCol_;
-    std::vector<std::string> namesCol_;
-    std::size_t lenRow_;
-    std::map<BC_ID, std::shared_ptr<std::uint8_t[]>> rows_;
-public:
-    Table_(const std::string& nameTable, BC_ID id, std::uint8_t cntCol, std::vector<std::uint8_t>& typesCol,
-           std::vector<std::string>& namesCol, type_id firstRow);
-    BC_ID addRow(std::shared_ptr<std::uint8_t[]> val, std::size_t lenRow);
-    std::size_t getCntRows() const {return rows_.size();}
-    std::string getName() const {return nameTable_;}
-    std::string getAllRows() const;
-};
-
-class DataBank::Papers_ {
-public:
-    static std::map<BC_ID, std::shared_ptr<std::uint8_t[]>> download(
-            type_id firstRow, BC_ID idTable, std::size_t lenRow);
-    static void upload(BC_ID idRow, BC_ID idTable, std::shared_ptr<std::uint8_t[]> val,std::size_t lenRow);
+    //TODO оптимизировать add
+    void add(const std::string& name, const std::string& value);
+    void del(const type_id& id);
+    void update(const type_id& id,const std::string& newName, const std::string& newValue);
+    std::string getAll();
+    std::string getAllWhereName(const std::string& name) const;
+    std::string getAllWhereValue(const std::string& value) const;
 };
 
 #endif // ! BC_DB_H_2024

@@ -23,6 +23,8 @@ add_executable(tests
         BUtests.cpp
         ../code/Logs.cpp
         LogsTests.cpp
+        DBtests.cpp
+        ../code/DB.cpp
 )
 target_link_libraries(tests GTest::gtest_main)
 
@@ -31,6 +33,7 @@ gtest_discover_tests(tests)
 
 add_executable(GlobalTest
         GT.cpp
+        ../code/DB.cpp
         ../code/Logs.cpp
 )
 
