@@ -22,4 +22,5 @@ testsMemory: BUtests LogsTests DBtests
 	valgrind --tool=memcheck --leak-check=full --undef-value-errors=no --error-exitcode=111 ./DBtests
 
 clean:
-	rm -rf *.o BUtests LogsTests DBtests resources/users.txt resources/users_hash resources/data_0.txt
+	rm -rf *.o BUtests LogsTests DBtests resources/users.txt resources/users_hash resources/data_*.txt resources/del_*.txt
+	rm -rf resources/upd_*.txt

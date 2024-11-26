@@ -45,6 +45,6 @@ namespace Logs {
         saveToFile("WARNING", message);
     }
     void debug(const char* message) {
-        //saveToConsole("DEBUG", message);
+        saveToConsole("DEBUG", message);
     }
 }

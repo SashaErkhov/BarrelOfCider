@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include "DB.h"
+#include "../code/DB.h"
 
 int main()
 {
@@ -14,6 +14,8 @@ int main()
     db.add("3", "3");
     db.add("4", "4");
     db.add("5", "5");
+    std::cout << db.getAll()<<"----------------------------"<<std::endl;
+    db.del(2);
     std::cout << db.getAll();
     return 0;
 }
