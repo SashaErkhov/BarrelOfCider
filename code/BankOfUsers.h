@@ -1,3 +1,5 @@
+//server
+
 #ifndef BC_BANKOFUSERS_2024
 #define BC_BANKOFUSERS_2024
 

@@ -1,3 +1,5 @@
+//server
+
 #include "BankOfUsers.h"
 #include "BC_Errors.h"
 #include "sha256.h"

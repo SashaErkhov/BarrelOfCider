@@ -32,11 +32,15 @@ jobs:
         run: ./LogsTests
       - name: test of DataBank
         run: ./DBtests
+      - name: test of LexicalAnalysis
+        run: ./LAtests
       - name: test of memory of Log
         run: valgrind --tool=memcheck --leak-check=full --undef-value-errors=no --error-exitcode=111 ./LogsTests
       - name: test of memory of BankOfUsers
         run: valgrind --tool=memcheck --leak-check=full --undef-value-errors=no --error-exitcode=111 ./BUtests
       - name: test of memory of DataBank
         run: valgrind --tool=memcheck --leak-check=full --undef-value-errors=no --error-exitcode=111 ./DBtests
+      - name: test of memory of LexicalAnalysis
+        run: valgrind --tool=memcheck --leak-check=full --undef-value-errors=no --error-exitcode=111 ./LAtests
       - name: make clean
         run: make clean

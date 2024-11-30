@@ -1,6 +1,4 @@
-//
-// Created by sasor on 20.11.2024.
-//
+//server and client
 
 #include "Logs.h"
 #include <fstream>

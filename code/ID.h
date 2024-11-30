@@ -1,6 +1,4 @@
-//
-// Created by sasor on 29.09.2024.
-//
+//server and client
 
 #pragma once
 #ifndef BC_ID_H
@@ -15,7 +13,7 @@ class IDer {
     type_id nextId_;
 public:
     IDer(): nextId_(0){}
-    type_id nextID() {return nextId_++;}
+    type_id nextID() noexcept {return nextId_++;}
 };
 
 #endif // ! BC_ID_H

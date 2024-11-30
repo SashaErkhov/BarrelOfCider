@@ -1,6 +1,4 @@
-//
-// Created by sasor on 29.09.2024.
-//
+//server
 
 #pragma once
 #ifndef BC_DB_H_2024

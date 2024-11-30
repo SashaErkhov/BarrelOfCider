@@ -25,6 +25,8 @@ add_executable(tests
         LogsTests.cpp
         DBtests.cpp
         ../code/DB.cpp
+        LAtests.cpp
+        ../code/LexicalAnalysis.cpp
 )
 target_link_libraries(tests GTest::gtest_main)
 

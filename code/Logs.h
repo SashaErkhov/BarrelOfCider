@@ -1,6 +1,4 @@
-//
-// Created by sasor on 20.11.2024.
-//
+//server and client
 
 #ifndef BC_LOGS_H
 #define BC_LOGS_H

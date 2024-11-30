@@ -1,3 +1,5 @@
+//server and client
+
 #ifndef BC_ERRORS_2024
 #define BC_ERRORS_2024
 

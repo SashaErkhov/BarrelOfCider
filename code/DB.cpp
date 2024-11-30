@@ -1,6 +1,5 @@
-//
-// Created by sasor on 29.09.2024.
-//
+//server
+
 
 #include "DB.h"
 #include "BC_Errors.h"
