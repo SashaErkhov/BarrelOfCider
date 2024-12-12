@@ -70,12 +70,15 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log) 
     }
     std::stringstream ss(str);
     std::string word;
+    ss>>word;
     switch(str[0]) {
         case 'r': {
+            word.clear(); 
             ss >> word;
             if(checkUsername(word, log)==LexResult::error) {
                 return LexResult::error;
             }
+            word.clear(); 
             ss>>word;
             if(checkPassword(word, log)==LexResult::error) {
                 return LexResult::error;
@@ -87,10 +90,12 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log) 
             break;
         }
         case 'a': {
+            word.clear(); 
             ss >> word;
             if(checkName_(word, log)==LexResult::error) {
                 return LexResult::error;
             }
+            word.clear(); 
             ss>>word;
             if(checkValue_(word, log)==LexResult::error) {
                 return LexResult::error;
@@ -102,6 +107,7 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log) 
             break;
         }
         case 'd': {
+            word.clear(); 
             ss >> word;
             if(checkID_(word, log)==LexResult::error) {
                 return LexResult::error;
@@ -113,14 +119,17 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log) 
             break;
         }
         case 'u': {
+            word.clear(); 
             ss >> word;
             if(checkID_(word, log)==LexResult::error) {
                 return LexResult::error;
             }
+            word.clear(); 
             ss>>word;
             if(checkName_(word, log)==LexResult::error) {
                 return LexResult::error;
             }
+            word.clear(); 
             ss>>word;
             if(checkValue_(word, log)==LexResult::error) {
                 return LexResult::error;
@@ -132,14 +141,17 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log) 
             break;
         }
         case 'g': {
+            word.clear(); 
             ss >> word;
             if(word=="all") {}
             else if(word=="name") {
+                word.clear(); 
                 ss>>word;
                 if(checkName_(word, log)==LexResult::error) {
                     return LexResult::error;
                 }
             } else if(word=="value") {
+                word.clear(); 
                 ss >> word;
                 if(checkValue_(word, log)==LexResult::error) {
                     return LexResult::error;
@@ -155,7 +167,7 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log) 
             break;
         }
         default: {
-            log = "unknown command";
+            log = "Unknown command";
             return LexResult::error;
         }
     }
@@ -199,7 +211,7 @@ LexResult LexicalAnalysis::checkID_(const std::string& id, std::string& log) {
     }
     std::uint64_t idNum=std::atoll(id.c_str());
     if(idNum>std::numeric_limits<type_id>::max()) {
-        log = "id is wrong";
+        log = "ID is wrong";
         return LexResult::error;
     }
     return LexResult::normal;
