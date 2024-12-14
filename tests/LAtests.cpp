@@ -54,89 +54,106 @@ TEST_F(LexicalAnalysisTest, CheckUsername_InvalidCharacters) {
 
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_r1) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("r Nick qwerty1234", log), LexResult::normal);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("r Nick qwerty1234", log,res), LexResult::normal);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_r2) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("r Nick", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("r Nick", log, res), LexResult::error);
     EXPECT_EQ(log, "Empty password");
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_a) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("a Note1 Hello_world0213409281049812094812094801294809218409128409128409128049812049821 ", log), LexResult::normal);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("a Note1 Hello_world0213409281049812094812094801294809218409128409128409128049812049821 ", log, res), LexResult::normal);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_d1) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("d 1234567", log), LexResult::normal);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("d 1234567", log, res), LexResult::normal);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_d2) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("d 1234567 something", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("d 1234567 something", log, res), LexResult::error);
     EXPECT_EQ(log, "Invalid command");
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_u1) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("u 1234567 Name NewValue", log), LexResult::normal);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("u 1234567 Name NewValue", log, res), LexResult::normal);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_u2) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("u 1234567 Name", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("u 1234567 Name", log, res), LexResult::error);
     EXPECT_EQ(log, "Empty value of record");
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_g1) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("g all", log), LexResult::normal);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("g all", log, res), LexResult::normal);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_g2) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("g name SomeName", log), LexResult::normal);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("g name SomeName", log, res), LexResult::normal);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_g3) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("g value SomeValue", log), LexResult::normal);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("g value SomeValue", log, res), LexResult::normal);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_Quit) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("q", log), LexResult::quit);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("q", log, res), LexResult::quit);
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_Unknown) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("q Name Surname", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("q Name Surname", log, res), LexResult::error);
     EXPECT_EQ(log, "Unknown command");
 }
 
 TEST_F(LexicalAnalysisTest, CheckID_tooLong) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("d 12345678912345", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("d 12345678912345", log, res), LexResult::error);
     EXPECT_EQ(log, "ID is wrong");
 }
 
 TEST_F(LexicalAnalysisTest, CheckID_SymbolicCharacters) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("d abcdefg", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("d abcdefg", log, res), LexResult::error);
     EXPECT_EQ(log, "Invalid ID of record");
 }
 
 TEST_F(LexicalAnalysisTest, CheckID_EmptyID) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("d", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("d", log, res), LexResult::error);
     EXPECT_EQ(log, "Empty ID of record");
 }
 
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_EmptyCommand) {
-    EXPECT_EQ(lexAnalyzer.checkBasic("", log), LexResult::error);
+    std::string res="";
+    EXPECT_EQ(lexAnalyzer.checkBasic("", log, res), LexResult::error);
     EXPECT_EQ(log, "Empty command");
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_TooLong) {
+    std::string res="";
     std::string longCommand(1201, 'a'); // Создаем строку длиной 1201 символ
-    EXPECT_EQ(lexAnalyzer.checkBasic(longCommand, log), LexResult::error);
+    EXPECT_EQ(lexAnalyzer.checkBasic(longCommand, log, res), LexResult::error);
     EXPECT_EQ(log, "Command is too long");
 }
 

@@ -7,26 +7,26 @@
 #include <limits>
 
 LexResult LexicalAnalysis::checkPassword(const std::string& password, std::string& log) noexcept {
-    if(password==quitStr_) return LexResult::quit;
-    if(password.empty()) {
+    if (password == quitStr_) return LexResult::quit;
+    if (password.empty()) {
         log = "Empty password";
         return LexResult::error;
     }
-    if(password.size()<4) {
+    if (password.size() < 4) {
         log = "Password is too short";
         return LexResult::error;
     }
-    if(password.size()>50) {
+    if (password.size() > 50) {
         log = "Password is too long";
         return LexResult::error;
     }
-    for(auto p: password) {
+    for (auto p : password) {
         if (!(
-                (p >= 'a' and p <= 'z') or
-                (p >= 'A' and p <= 'Z') or
-                (p >= '0' and p <= '9') or
-                (p == '-' or p == '_')
-        )) {
+            (p >= 'a' and p <= 'z') or
+            (p >= 'A' and p <= 'Z') or
+            (p >= '0' and p <= '9') or
+            (p == '-' or p == '_')
+            )) {
             log = R"(Invalid password. Please, use: 'a'-'z' or 'A'-'Z' or '0'-'9' or '_' or '-')";
             return LexResult::error;
         }
@@ -35,21 +35,21 @@ LexResult LexicalAnalysis::checkPassword(const std::string& password, std::strin
 }
 
 LexResult LexicalAnalysis::checkUsername(const std::string& username, std::string& log) noexcept {
-    if(username.empty()) {
+    if (username.empty()) {
         log = "Empty username";
         return LexResult::error;
     }
-    if(username.size()>50) {
+    if (username.size() > 50) {
         log = "Username is too long";
         return LexResult::error;
     }
-    for(auto p: username){
-        if( !(
-                (p >= 'a' and p <= 'z') or
-                (p >= 'A' and p <= 'Z') or
-                (p >= '0' and p <= '9') or
-                (p == '-' or p == '_')
-        ) )
+    for (auto p : username) {
+        if (!(
+            (p >= 'a' and p <= 'z') or
+            (p >= 'A' and p <= 'Z') or
+            (p >= '0' and p <= '9') or
+            (p == '-' or p == '_')
+            ))
         {
             log = R"(Invalid username. Please, use: 'a'-'z' or 'A'-'Z' or '0'-'9' or '_' or '-')";
             return LexResult::error;
@@ -58,128 +58,152 @@ LexResult LexicalAnalysis::checkUsername(const std::string& username, std::strin
     return LexResult::normal;
 }
 
-LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log) noexcept {
-    if(str==quitStr_) return LexResult::quit;
-    if(str.empty()) {
+LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log, std::string& res) noexcept { 
+    if (str == quitStr_) return LexResult::quit;
+    if (str.empty()) {
         log = "Empty command";
         return LexResult::error;
     }
-    if(str.size() > 1200) {
+    if (str.size() > 1200) {
         log = "Command is too long";
         return LexResult::error;
     }
     std::stringstream ss(str);
     std::string word;
-    ss>>word;
-    switch(str[0]) {
-        case 'r': {
-            word.clear(); 
-            ss >> word;
-            if(checkUsername(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            word.clear(); 
-            ss>>word;
-            if(checkPassword(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            if(ss>>word) {
-                log = "Invalid command";
-                return LexResult::error;
-            }
-            break;
+    ss >> word;
+    switch (str[0]) {
+    case 'r': {
+        res += 'r';
+        word.clear();
+        ss >> word;
+        res += word;
+        res += ' ';
+        if (checkUsername(word, log) == LexResult::error) {
+            return LexResult::error;
         }
-        case 'a': {
-            word.clear(); 
-            ss >> word;
-            if(checkName_(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            word.clear(); 
-            ss>>word;
-            if(checkValue_(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            if(ss>>word) {
-                log = "Invalid command";
-                return LexResult::error;
-            }
-            break;
+        word.clear();
+        ss >> word;
+        res += word;
+        if (checkPassword(word, log) == LexResult::error) {
+            return LexResult::error;
         }
-        case 'd': {
-            word.clear(); 
-            ss >> word;
-            if(checkID_(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            if(ss>>word) {
-                log = "Invalid command";
-                return LexResult::error;
-            }
-            break;
+        if (ss >> word) {
+            log = "Invalid command";
+            return LexResult::error;
         }
-        case 'u': {
-            word.clear(); 
-            ss >> word;
-            if(checkID_(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            word.clear(); 
-            ss>>word;
-            if(checkName_(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            word.clear(); 
-            ss>>word;
-            if(checkValue_(word, log)==LexResult::error) {
-                return LexResult::error;
-            }
-            if(ss>>word) {
-                log = "Invalid command";
-                return LexResult::error;
-            }
-            break;
+        break;
+    }
+    case 'a': {
+        res += 'a';
+        word.clear();
+        ss >> word;
+        res += word;
+        res += ' ';
+        if (checkName_(word, log) == LexResult::error) {
+            return LexResult::error;
         }
-        case 'g': {
-            word.clear(); 
-            ss >> word;
-            if(word=="all") {}
-            else if(word=="name") {
-                word.clear(); 
-                ss>>word;
-                if(checkName_(word, log)==LexResult::error) {
-                    return LexResult::error;
-                }
-            } else if(word=="value") {
-                word.clear(); 
-                ss >> word;
-                if(checkValue_(word, log)==LexResult::error) {
-                    return LexResult::error;
-                }
-            } else {
-                log = "Unknown command";
-                return LexResult::error;
-            }
-            if(ss>>word) {
-                log = "Invalid command";
-                return LexResult::error;
-            }
-            break;
+        word.clear();
+        ss >> word;
+        res += word;
+        if (checkValue_(word, log) == LexResult::error) {
+            return LexResult::error;
         }
-        default: {
+        if (ss >> word) {
+            log = "Invalid command";
+            return LexResult::error;
+        }
+        break;
+    }
+    case 'd': {
+        res += 'd';
+        word.clear();
+        ss >> word;
+        res += word;
+        if (checkID_(word, log) == LexResult::error) {
+            return LexResult::error;
+        }
+        if (ss >> word) {
+            log = "Invalid command";
+            return LexResult::error;
+        }
+        break;
+    }
+    case 'u': {
+        res += 'u';
+        word.clear();
+        ss >> word;
+        res += word;
+        res += ' ';
+        if (checkID_(word, log) == LexResult::error) {
+            return LexResult::error;
+        }
+        word.clear();
+        ss >> word;
+        res += word;
+        res += ' ';
+        if (checkName_(word, log) == LexResult::error) {
+            return LexResult::error;
+        }
+        word.clear();
+        ss >> word;
+        res += word;
+        if (checkValue_(word, log) == LexResult::error) {
+            return LexResult::error;
+        }
+        if (ss >> word) {
+            log = "Invalid command";
+            return LexResult::error;
+        }
+        break;
+    }
+    case 'g': {
+        word.clear();
+        ss >> word;
+        if (word == "all") { res += 'l'; }
+        else if (word == "name") {
+            res += 'n';
+            word.clear();
+            ss >> word;
+            res += word;
+            res += ' ';
+            if (checkName_(word, log) == LexResult::error) {
+                return LexResult::error;
+            }
+        }
+        else if (word == "value") {
+            res += 'v';
+            word.clear();
+            ss >> word;
+            res += word;
+            res += ' ';
+            if (checkValue_(word, log) == LexResult::error) {
+                return LexResult::error;
+            }
+        }
+        else {
             log = "Unknown command";
             return LexResult::error;
         }
+        if (ss >> word) {
+            log = "Invalid command";
+            return LexResult::error;
+        }
+        break;
+    }
+    default: {
+        log = "Unknown command";
+        return LexResult::error;
+    }
     }
     return LexResult::normal;
 }
 
-LexResult LexicalAnalysis::checkName_(const std::string &name, std::string &log) {
-    if(name.empty()) {
+LexResult LexicalAnalysis::checkName_(const std::string& name, std::string& log) {
+    if (name.empty()) {
         log = "Empty name of record";
         return LexResult::error;
     }
-    if(name.size()>50) {
+    if (name.size() > 50) {
         log = "Name of record is too long";
         return LexResult::error;
     }
@@ -187,11 +211,11 @@ LexResult LexicalAnalysis::checkName_(const std::string &name, std::string &log)
 }
 
 LexResult LexicalAnalysis::checkValue_(const std::string& value, std::string& log) {
-    if(value.empty()) {
+    if (value.empty()) {
         log = "Empty value of record";
         return LexResult::error;
     }
-    if(value.size()>1024) {
+    if (value.size() > 1024) {
         log = "Value of record is too long";
         return LexResult::error;
     }
@@ -199,18 +223,18 @@ LexResult LexicalAnalysis::checkValue_(const std::string& value, std::string& lo
 }
 
 LexResult LexicalAnalysis::checkID_(const std::string& id, std::string& log) {
-    if(id.empty()) {
+    if (id.empty()) {
         log = "Empty ID of record";
         return LexResult::error;
     }
-    for(auto p: id) {
-        if( !(p>='0' and p<='9') )  {
+    for (auto p : id) {
+        if (!(p >= '0' and p <= '9')) {
             log = "Invalid ID of record";
             return LexResult::error;
         }
     }
-    std::uint64_t idNum=std::atoll(id.c_str());
-    if(idNum>std::numeric_limits<type_id>::max()) {
+    std::uint64_t idNum = std::atoll(id.c_str());
+    if (idNum > std::numeric_limits<type_id>::max()) {
         log = "ID is wrong";
         return LexResult::error;
     }
