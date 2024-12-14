@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif BC_LEXICALANALYSIS_H
+#endif //BC_LEXICALANALYSIS_H
