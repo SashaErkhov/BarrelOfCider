@@ -56,6 +56,7 @@ TEST_F(LexicalAnalysisTest, CheckUsername_InvalidCharacters) {
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_r1) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("r Nick qwerty1234", log,res), LexResult::normal);
+    EXPECT_EQ(res,"rNick qwerty1234");
     EXPECT_TRUE(log.empty());
 }
 
@@ -68,12 +69,14 @@ TEST_F(LexicalAnalysisTest, CheckBasicCommand_r2) {
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_a) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("a Note1 Hello_world0213409281049812094812094801294809218409128409128409128049812049821 ", log, res), LexResult::normal);
+    EXPECT_EQ(res,"aNote1 Hello_world0213409281049812094812094801294809218409128409128409128049812049821");
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_d1) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("d 1234567", log, res), LexResult::normal);
+    EXPECT_EQ(res,"d1234567");
     EXPECT_TRUE(log.empty());
 }
 
@@ -86,6 +89,7 @@ TEST_F(LexicalAnalysisTest, CheckBasicCommand_d2) {
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_u1) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("u 1234567 Name NewValue", log, res), LexResult::normal);
+    EXPECT_EQ(res,"u1234567 Name NewValue");
     EXPECT_TRUE(log.empty());
 }
 
@@ -98,24 +102,28 @@ TEST_F(LexicalAnalysisTest, CheckBasicCommand_u2) {
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_g1) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("g all", log, res), LexResult::normal);
+    EXPECT_EQ(res,"l");
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_g2) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("g name SomeName", log, res), LexResult::normal);
+    EXPECT_EQ(res,"nSomeName");
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_g3) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("g value SomeValue", log, res), LexResult::normal);
+    EXPECT_EQ(res,"vSomeValue");
     EXPECT_TRUE(log.empty());
 }
 
 TEST_F(LexicalAnalysisTest, CheckBasicCommand_Quit) {
     std::string res="";
     EXPECT_EQ(lexAnalyzer.checkBasic("q", log, res), LexResult::quit);
+    EXPECT_EQ(res,"");
     EXPECT_TRUE(log.empty());
 }
 
