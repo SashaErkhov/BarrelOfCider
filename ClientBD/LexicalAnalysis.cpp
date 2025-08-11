@@ -165,6 +165,7 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log, 
             word.clear();
             ss >> word;
             res += word;
+            res += ' ';
             if (checkName_(word, log) == LexResult::error) {
                 return LexResult::error;
             }
@@ -174,6 +175,7 @@ LexResult LexicalAnalysis::checkBasic(const std::string& str, std::string& log, 
             word.clear();
             ss >> word;
             res += word;
+            res += ' ';
             if (checkValue_(word, log) == LexResult::error) {
                 return LexResult::error;
             }

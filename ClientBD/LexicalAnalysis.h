@@ -18,10 +18,10 @@ class LexicalAnalysis {
     LexResult checkValue_(const std::string& value, std::string& log);
     LexResult checkID_(const std::string& id, std::string& log);
 public:
-    LexResult checkBasic(const std::string& str, std::string& log, std::string& res) noexcept ;
+    LexResult checkBasic(const std::string& str, std::string& log, std::string& res) noexcept;
     LexResult checkPassword(const std::string& password, std::string& log) noexcept;
     LexResult checkUsername(const std::string& username, std::string& log) noexcept;
 };
 
 
-#endif //BC_LEXICALANALYSIS_H
+#endif BC_LEXICALANALYSIS_H
